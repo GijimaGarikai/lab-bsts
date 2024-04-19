@@ -63,8 +63,32 @@ public class SimpleBST<K,V> implements SimpleMap<K,V> {
 
   @Override
   public V set(K key, V value) {
-    return null;        // STUB
+    if(key == null){
+      throw new NullPointerException("null key");
+    }
+  
+    this.root = setHelper(key, value, this.root);
+    return this.cachedValue;
   } // set(K,V)
+
+  public BSTNode<K,V> setHelper(K key, V value, BSTNode<K,V> root){
+    if(root == null){
+      BSTNode<K, V> ret = new BSTNode<K,V>(key, value);
+      this.cachedValue = null;
+      return ret;
+    }
+    int comp = this.comparator.compare(key, root.key);
+    if(comp == 0){
+      this.cachedValue = root.value;
+      root.value = value;
+    } else if (comp < 0){
+      root.left = setHelper(key, value, root.left);
+    } else {
+      root.right = setHelper(key, value, root.right);
+    }
+    return root;
+  
+}
 
   @Override
   public V get(K key) {
@@ -135,9 +159,16 @@ public class SimpleBST<K,V> implements SimpleMap<K,V> {
 
   @Override
   public void forEach(BiConsumer<? super K, ? super V> action) {
-    // STUB
+    forEachHelper(this.root, action);
   } // forEach
-
+  public void forEachHelper(BSTNode<K,V> root, BiConsumer<? super K, ? super V> action) {
+    if (root == null) {
+      return;
+    }
+    action.accept(root.key, root.value);
+    forEachHelper(root.left, action);
+    forEachHelper(root.right, action);
+  }
   // +----------------------+----------------------------------------
   // | Other public methods |
   // +----------------------+
